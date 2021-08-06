@@ -31,6 +31,15 @@ func (m *InMemoryStorage) GetAll() (response []contact.Contact, err error) {
 	return response, nil
 }
 
+func (m *InMemoryStorage) Get(id string) (response contact.Contact, err error) {
+	response, ok := m.PhoneBook[id]
+	if !ok {
+		return response, fmt.Errorf("contact with id: %s does not exist on database", id)
+	}
+
+	return
+}
+
 func NewMemoryStorage() *InMemoryStorage {
 	return &InMemoryStorage{
 		PhoneBook: make(map[string]contact.Contact),

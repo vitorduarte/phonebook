@@ -138,3 +138,58 @@ func TestInMemoryStorage_GetAll(t *testing.T) {
 		})
 	}
 }
+
+func TestInMemoryStorage_Get(t *testing.T) {
+	tests := []struct {
+		name         string
+		storage      *InMemoryStorage
+		arg          string
+		wantErr      bool
+		wantedResult contact.Contact
+	}{
+		{
+			name:    "empty_id_should_return_error",
+			storage: NewMemoryStorage(),
+			arg:     "",
+			wantErr: true,
+		},
+		{
+			name:    "inexistent_id_should_return_error",
+			storage: NewMemoryStorage(),
+			arg:     "1",
+			wantErr: true,
+		},
+		{
+			name: "existent_id_should_return_valid_contact",
+			arg:  "1",
+			storage: &InMemoryStorage{
+				PhoneBook: map[string]contact.Contact{
+					"1": {
+						Id:    "1",
+						Name:  "Bob",
+						Phone: "999999999",
+					},
+				},
+			},
+			wantErr: false,
+			wantedResult: contact.Contact{
+				Id:    "1",
+				Name:  "Bob",
+				Phone: "999999999",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.storage.Get(tt.arg)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if result != tt.wantedResult {
+				t.Errorf("result = %v, wantedResult = %v", result, tt.wantedResult)
+			}
+		})
+	}
+}

@@ -4,20 +4,19 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/vitorduarte/phonebook/internal/contact"
 )
 
 type InMemoryStorage struct {
-	PhoneBook map[string]contact.Contact
+	PhoneBook map[string]Contact
 }
 
 func NewMemoryStorage() *InMemoryStorage {
 	return &InMemoryStorage{
-		PhoneBook: make(map[string]contact.Contact),
+		PhoneBook: make(map[string]Contact),
 	}
 }
 
-func (m *InMemoryStorage) Create(c contact.Contact) (contactResponse contact.Contact, err error) {
+func (m *InMemoryStorage) Create(c Contact) (contactResponse Contact, err error) {
 	if c.Name == "" && c.Phone == "" {
 		err = fmt.Errorf("Name and phone cannot be empty")
 		return
@@ -36,7 +35,7 @@ func (m *InMemoryStorage) Create(c contact.Contact) (contactResponse contact.Con
 	return
 }
 
-func (m *InMemoryStorage) GetAll() (response []contact.Contact, err error) {
+func (m *InMemoryStorage) GetAll() (response []Contact, err error) {
 	for _, c := range m.PhoneBook {
 		response = append(response, c)
 	}
@@ -44,7 +43,7 @@ func (m *InMemoryStorage) GetAll() (response []contact.Contact, err error) {
 	return response, nil
 }
 
-func (m *InMemoryStorage) Get(id string) (response contact.Contact, err error) {
+func (m *InMemoryStorage) Get(id string) (response Contact, err error) {
 	response, ok := m.PhoneBook[id]
 	if !ok {
 		return response, fmt.Errorf("contact with id: %s does not exist on database", id)
@@ -53,7 +52,7 @@ func (m *InMemoryStorage) Get(id string) (response contact.Contact, err error) {
 	return
 }
 
-func (m *InMemoryStorage) Update(c contact.Contact) (response contact.Contact, err error) {
+func (m *InMemoryStorage) Update(c Contact) (response Contact, err error) {
 	if _, ok := m.PhoneBook[c.Id]; !ok {
 		err = fmt.Errorf("contact with id: %s does not exist on database", c.Id)
 	}

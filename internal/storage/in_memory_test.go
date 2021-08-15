@@ -3,8 +3,6 @@ package storage
 import (
 	"reflect"
 	"testing"
-
-	"github.com/vitorduarte/phonebook/internal/contact"
 )
 
 func TestNewMemoryStorage(t *testing.T) {
@@ -15,7 +13,7 @@ func TestNewMemoryStorage(t *testing.T) {
 		{
 			name: "new_memory_storage",
 			want: &InMemoryStorage{
-				PhoneBook: map[string]contact.Contact{},
+				PhoneBook: map[string]Contact{},
 			},
 		},
 	}
@@ -29,31 +27,26 @@ func TestNewMemoryStorage(t *testing.T) {
 }
 
 func TestInMemoryStorage_Create(t *testing.T) {
-	type args struct {
-		c contact.Contact
-	}
 	tests := []struct {
 		name      string
 		storage   *InMemoryStorage
-		args      args
+		arg       Contact
 		wantErr   bool
 		wantCount int
 	}{
 		{
 			name:      "empty_contact_should_return_error",
 			storage:   NewMemoryStorage(),
-			args:      args{c: contact.Contact{}},
+			arg:       Contact{},
 			wantErr:   true,
 			wantCount: 0,
 		},
 		{
 			name:    "empty_storage",
 			storage: NewMemoryStorage(),
-			args: args{
-				c: contact.Contact{
-					Name:  "Bob",
-					Phone: "999999999",
-				},
+			arg: Contact{
+				Name:  "Bob",
+				Phone: "999999999",
 			},
 			wantErr:   false,
 			wantCount: 1,
@@ -61,7 +54,7 @@ func TestInMemoryStorage_Create(t *testing.T) {
 		{
 			name: "with_one_contact_on_storage",
 			storage: &InMemoryStorage{
-				PhoneBook: map[string]contact.Contact{
+				PhoneBook: map[string]Contact{
 					"1": {
 						Id:    "1",
 						Name:  "Bob",
@@ -69,12 +62,10 @@ func TestInMemoryStorage_Create(t *testing.T) {
 					},
 				},
 			},
-			args: args{
-				c: contact.Contact{
-					Id:    "2",
-					Name:  "Alice",
-					Phone: "999999999",
-				},
+			arg: Contact{
+				Id:    "2",
+				Name:  "Alice",
+				Phone: "999999999",
 			},
 			wantErr:   false,
 			wantCount: 2,
@@ -83,7 +74,7 @@ func TestInMemoryStorage_Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resultContact, err := tt.storage.Create(tt.args.c)
+			resultContact, err := tt.storage.Create(tt.arg)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InMemoryStorage.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -105,17 +96,17 @@ func TestInMemoryStorage_GetAll(t *testing.T) {
 	tests := []struct {
 		name       string
 		storage    *InMemoryStorage
-		wantResult []contact.Contact
+		wantResult []Contact
 	}{
 		{
 			name:       "empty_storage_should_return_empty_slice",
 			storage:    NewMemoryStorage(),
-			wantResult: []contact.Contact{},
+			wantResult: []Contact{},
 		},
 		{
 			name: "storage_with_one_contact_on_storage",
 			storage: &InMemoryStorage{
-				PhoneBook: map[string]contact.Contact{
+				PhoneBook: map[string]Contact{
 					"1": {
 						Id:    "1",
 						Name:  "Bob",
@@ -123,7 +114,7 @@ func TestInMemoryStorage_GetAll(t *testing.T) {
 					},
 				},
 			},
-			wantResult: []contact.Contact{
+			wantResult: []Contact{
 				{
 					Id:    "1",
 					Name:  "Bob",
@@ -162,7 +153,7 @@ func TestInMemoryStorage_Get(t *testing.T) {
 		storage    *InMemoryStorage
 		args       args
 		wantErr    bool
-		wantResult contact.Contact
+		wantResult Contact
 	}{
 		{
 			name:    "empty_id_should_return_error",
@@ -180,7 +171,7 @@ func TestInMemoryStorage_Get(t *testing.T) {
 			name: "existent_id_should_return_valid_contact",
 			args: args{id: "d38cbda4-c419-410a-8fea-2ccd2523f2b2"},
 			storage: &InMemoryStorage{
-				PhoneBook: map[string]contact.Contact{
+				PhoneBook: map[string]Contact{
 					"d38cbda4-c419-410a-8fea-2ccd2523f2b2": {
 						Id:    "d38cbda4-c419-410a-8fea-2ccd2523f2b2",
 						Name:  "Bob",
@@ -189,7 +180,7 @@ func TestInMemoryStorage_Get(t *testing.T) {
 				},
 			},
 			wantErr: false,
-			wantResult: contact.Contact{
+			wantResult: Contact{
 				Id:    "d38cbda4-c419-410a-8fea-2ccd2523f2b2",
 				Name:  "Bob",
 				Phone: "999999999",
@@ -213,19 +204,19 @@ func TestInMemoryStorage_Get(t *testing.T) {
 
 func TestInMemoryStorage_Update(t *testing.T) {
 	type args struct {
-		c contact.Contact
+		c Contact
 	}
 	tests := []struct {
 		name         string
 		m            *InMemoryStorage
 		args         args
-		wantResponse contact.Contact
+		wantResponse Contact
 		wantErr      bool
 	}{
 		{
 			name: "existent_contact",
 			m: &InMemoryStorage{
-				PhoneBook: map[string]contact.Contact{
+				PhoneBook: map[string]Contact{
 					"d38cbda4-c419-410a-8fea-2ccd2523f2b2": {
 						Id:    "d38cbda4-c419-410a-8fea-2ccd2523f2b2",
 						Name:  "Bob",
@@ -234,13 +225,13 @@ func TestInMemoryStorage_Update(t *testing.T) {
 				},
 			},
 			args: args{
-				c: contact.Contact{
+				c: Contact{
 					Id:    "d38cbda4-c419-410a-8fea-2ccd2523f2b2",
 					Name:  "Alice",
 					Phone: "999999999",
 				},
 			},
-			wantResponse: contact.Contact{
+			wantResponse: Contact{
 				Id:    "d38cbda4-c419-410a-8fea-2ccd2523f2b2",
 				Name:  "Alice",
 				Phone: "999999999",

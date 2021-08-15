@@ -6,10 +6,10 @@ type Contact struct {
 	Phone string `json:"phone"`
 }
 
-type iStorage interface {
-	Create(c Contact) error
+type Storage interface {
+	Create(c Contact) (Contact, error)
 	GetAll() ([]Contact, error)
-	Get(id string) error
-	Update(id string, c Contact) error
+	Get(id string) (Contact, error)
+	Update(c Contact) (Contact, error)
 	Delete(id string) error
 }

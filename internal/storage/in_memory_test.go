@@ -238,6 +238,20 @@ func TestInMemoryStorage_Update(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "inexistent_contact",
+			m: &InMemoryStorage{
+				PhoneBook: map[string]Contact{},
+			},
+			args: args{
+				c: Contact{
+					Id:    "d38cbda4-c419-410a-8fea-2ccd2523f2b2",
+					Name:  "Alice",
+					Phone: "999999999",
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -248,6 +262,52 @@ func TestInMemoryStorage_Update(t *testing.T) {
 			}
 			if !reflect.DeepEqual(gotResponse, tt.wantResponse) {
 				t.Errorf("InMemoryStorage.Update() = %v, want %v", gotResponse, tt.wantResponse)
+			}
+		})
+	}
+}
+
+func TestInMemoryStorage_Delete(t *testing.T) {
+	type args struct {
+		id string
+	}
+	tests := []struct {
+		name    string
+		m       *InMemoryStorage
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "existent_contact",
+			m: &InMemoryStorage{
+				PhoneBook: map[string]Contact{
+					"d38cbda4-c419-410a-8fea-2ccd2523f2b2": {
+						Id:    "d38cbda4-c419-410a-8fea-2ccd2523f2b2",
+						Name:  "Bob",
+						Phone: "999999999",
+					},
+				},
+			},
+			args: args{
+				id: "d38cbda4-c419-410a-8fea-2ccd2523f2b2",
+			},
+			wantErr: false,
+		},
+		{
+			name: "inexistent_contact",
+			m: &InMemoryStorage{
+				PhoneBook: map[string]Contact{},
+			},
+			args: args{
+				id: "d38cbda4-c419-410a-8fea-2ccd2523f2b2",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.m.Delete(tt.args.id); (err != nil) != tt.wantErr {
+				t.Errorf("InMemoryStorage.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

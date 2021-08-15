@@ -55,9 +55,19 @@ func (m *InMemoryStorage) Get(id string) (response Contact, err error) {
 func (m *InMemoryStorage) Update(c Contact) (response Contact, err error) {
 	if _, ok := m.PhoneBook[c.Id]; !ok {
 		err = fmt.Errorf("contact with id: %s does not exist on database", c.Id)
+		return
 	}
 
 	m.PhoneBook[c.Id] = c
 	response = c
 	return
+}
+
+func (m *InMemoryStorage) Delete(id string) error {
+	if _, ok := m.PhoneBook[id]; !ok {
+		return fmt.Errorf("contact with id: %s does not exist on database", id)
+	}
+
+	delete(m.PhoneBook, id)
+	return nil
 }

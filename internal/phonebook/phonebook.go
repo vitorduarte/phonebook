@@ -3,7 +3,6 @@ package phonebook
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/vitorduarte/phonebook/internal/storage"
@@ -34,11 +33,10 @@ func Contact(s storage.Storage) http.HandlerFunc {
 func CreateContact(s storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-
-		if r.Body == nil {
-			log.Println("create requires a request body")
+		if r.Body == http.NoBody {
+			msg := fmt.Sprintf("create requires a request body")
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(badRequestResponse)
+			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return
 		}
 
@@ -46,16 +44,14 @@ func CreateContact(s storage.Storage) http.HandlerFunc {
 		err := json.NewDecoder(r.Body).Decode(&contact)
 		if err != nil {
 			msg := fmt.Sprintf("could not create contact: %v", err)
-			log.Println(msg)
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(badRequestResponse)
+			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return
 		}
 
 		response, err := s.Create(contact)
 		if err != nil {
 			msg := fmt.Sprintf("an error occurred while trying to create contact: %v", err)
-			log.Println(msg)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return
@@ -91,7 +87,6 @@ func GetAllContacts(s storage.Storage) http.HandlerFunc {
 		contacts, err := s.GetAll()
 		if err != nil {
 			msg := fmt.Sprintf("an error occurred while trying to get all contacts: %v", err)
-			log.Println(msg)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return
@@ -114,7 +109,6 @@ func GetContactById(s storage.Storage) http.HandlerFunc {
 		contact, err := s.Get(id)
 		if err != nil {
 			msg := fmt.Sprintf("an error occurred while trying to get contact: %v", err)
-			log.Println(msg)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return
@@ -132,7 +126,6 @@ func FindContactsByName(s storage.Storage) http.HandlerFunc {
 		contacts, err := s.FindByName(name)
 		if err != nil {
 			msg := fmt.Sprintf("an error occurred while trying to get contact: %v", err)
-			log.Println(msg)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return
@@ -153,16 +146,16 @@ func UpdateContact(s storage.Storage) http.HandlerFunc {
 
 		id := r.URL.Query().Get("id")
 		if id == "" {
-			log.Println("update requires an id")
+			msg := fmt.Sprintf("update requires an id")
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(badRequestResponse)
+			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return
 		}
 
 		if r.Body == nil {
-			log.Println("update requires a request body")
+			msg := fmt.Sprintf("update requires a request body")
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(badRequestResponse)
+			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return
 		}
 
@@ -170,9 +163,8 @@ func UpdateContact(s storage.Storage) http.HandlerFunc {
 		err := json.NewDecoder(r.Body).Decode(&contact)
 		if err != nil {
 			msg := fmt.Sprintf("could not update contact: %v", err)
-			log.Println(msg)
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(badRequestResponse)
+			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return
 		}
 
@@ -180,7 +172,6 @@ func UpdateContact(s storage.Storage) http.HandlerFunc {
 		response, err := s.Update(contact)
 		if err != nil {
 			msg := fmt.Sprintf("an error occurred while trying to update contact: %v", err)
-			log.Println(msg)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return
@@ -196,16 +187,15 @@ func DeleteContact(s storage.Storage) http.HandlerFunc {
 
 		id := r.URL.Query().Get("id")
 		if id == "" {
-			log.Println("delete requires an id")
+			msg := fmt.Sprintf("delete requires an id")
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(badRequestResponse)
+			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return
 		}
 
 		err := s.Delete(id)
 		if err != nil {
 			msg := fmt.Sprintf("an error occurred while trying to delete contact: %v", err)
-			log.Println(msg)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
 			return

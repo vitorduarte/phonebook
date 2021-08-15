@@ -21,14 +21,9 @@ func main() {
 	s := storage.NewMemoryStorage()
 	router := http.NewServeMux()
 
-	router.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application-json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message":"service is up and running"}`))
-		return
-	})
+	router.Handle("/healthcheck", phonebook.LogEndpointHitMiddleware(healthcheck()))
 	router.Handle("/metrics", promhttp.Handler())
-	router.HandleFunc("/contact", phonebook.Contact(s))
+	router.Handle("/contact", phonebook.LogEndpointHitMiddleware(phonebook.Contact(s)))
 
 	srv := http.Server{
 		Addr:         fmt.Sprintf(":%v", *port),
@@ -39,4 +34,13 @@ func main() {
 
 	fmt.Printf("http server listening on port %v\n", *port)
 	log.Fatal(srv.ListenAndServe())
+}
+
+func healthcheck() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application-json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message":"service is up and running"}`))
+		return
+	}
 }

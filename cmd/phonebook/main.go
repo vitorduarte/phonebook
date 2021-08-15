@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,6 +13,11 @@ import (
 )
 
 func main() {
+	writeTimeout := flag.Int("w", 1, "maximum duration before timing out writes of the response in seconds")
+	readTimeout := flag.Int("r", 1, "maximum duration before timing out reads of the response in seconds")
+	port := flag.Int("p", 8080, "port to expose the application")
+	flag.Parse()
+
 	s := storage.NewMemoryStorage()
 	router := http.NewServeMux()
 
@@ -25,12 +31,12 @@ func main() {
 	router.HandleFunc("/contact", phonebook.Contact(s))
 
 	srv := http.Server{
-		Addr:         ":8080",
-		WriteTimeout: 1 * time.Second,
-		ReadTimeout:  1 * time.Second,
+		Addr:         fmt.Sprintf(":%v", *port),
+		WriteTimeout: time.Duration(*writeTimeout) * time.Second,
+		ReadTimeout:  time.Duration(*readTimeout) * time.Second,
 		Handler:      router,
 	}
 
-	fmt.Println("http server listening on port 8080")
+	fmt.Printf("http server listening on port %v\n", *port)
 	log.Fatal(srv.ListenAndServe())
 }

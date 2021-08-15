@@ -68,26 +68,48 @@ func CreateContact(s storage.Storage) http.HandlerFunc {
 func GetContacts(s storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-
 		id := r.URL.Query().Get("id")
-		if id == "" {
-			contacts, err := s.GetAll()
-			if err != nil {
-				msg := fmt.Sprintf("an error occurred while trying to get all contacts: %v", err)
-				log.Println(msg)
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
-				return
-			}
+		name := r.URL.Query().Get("name")
+		isGetAll := id == "" && name == ""
+		isGetById := id != ""
 
-			response := make([]interface{}, len(contacts))
-			for i, c := range contacts {
-				response[i] = c
-			}
-
-			json.NewEncoder(w).Encode(response)
+		if isGetAll {
+			GetAllContacts(s)(w, r)
 			return
 		}
+		if isGetById {
+			GetContactById(s)(w, r)
+			return
+		}
+		FindContactsByName(s)(w, r)
+
+	}
+}
+
+func GetAllContacts(s storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		contacts, err := s.GetAll()
+		if err != nil {
+			msg := fmt.Sprintf("an error occurred while trying to get all contacts: %v", err)
+			log.Println(msg)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
+			return
+		}
+
+		response := make([]interface{}, len(contacts))
+		for i, c := range contacts {
+			response[i] = c
+		}
+
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+}
+
+func GetContactById(s storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := r.URL.Query().Get("id")
 
 		contact, err := s.Get(id)
 		if err != nil {
@@ -99,6 +121,29 @@ func GetContacts(s storage.Storage) http.HandlerFunc {
 		}
 
 		json.NewEncoder(w).Encode(contact)
+		return
+	}
+}
+
+func FindContactsByName(s storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		name := r.URL.Query().Get("name")
+
+		contacts, err := s.FindByName(name)
+		if err != nil {
+			msg := fmt.Sprintf("an error occurred while trying to get contact: %v", err)
+			log.Println(msg)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, msg)))
+			return
+		}
+
+		response := make([]interface{}, len(contacts))
+		for i, c := range contacts {
+			response[i] = c
+		}
+
+		json.NewEncoder(w).Encode(response)
 	}
 }
 

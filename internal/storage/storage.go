@@ -12,4 +12,5 @@ type Storage interface {
 	Get(id string) (Contact, error)
 	Update(c Contact) (Contact, error)
 	Delete(id string) error
+	FindByName(name string) ([]Contact, error)
 }

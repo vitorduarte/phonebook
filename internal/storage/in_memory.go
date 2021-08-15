@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -70,4 +71,14 @@ func (m *InMemoryStorage) Delete(id string) error {
 
 	delete(m.PhoneBook, id)
 	return nil
+}
+
+func (m *InMemoryStorage) FindByName(name string) (response []Contact, err error) {
+	for _, c := range m.PhoneBook {
+		if strings.Contains(c.Name, name) {
+			response = append(response, c)
+		}
+	}
+
+	return
 }

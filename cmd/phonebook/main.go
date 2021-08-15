@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/vitorduarte/phonebook/internal/phonebook"
 	"github.com/vitorduarte/phonebook/internal/storage"
 )
@@ -20,7 +21,7 @@ func main() {
 		w.Write([]byte(`{"message":"service is up and running"}`))
 		return
 	})
-
+	router.Handle("/metrics", promhttp.Handler())
 	router.HandleFunc("/contact", phonebook.Contact(s))
 
 	srv := http.Server{

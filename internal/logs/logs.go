@@ -1,4 +1,4 @@
-package phonebook
+package logs
 
 import (
 	"encoding/json"
@@ -6,36 +6,15 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	interceptor "github.com/vitorduarte/phonebook/internal/interceptor"
 )
-
-type StatusRecorder struct {
-	http.ResponseWriter
-	Status          int
-	ResponseMessage []byte
-}
-
-func (r *StatusRecorder) WriteHeader(statusCode int) {
-	r.Status = statusCode
-	r.ResponseWriter.WriteHeader(statusCode)
-}
-
-func (r *StatusRecorder) Write(b []byte) (int, error) {
-	r.ResponseMessage = b
-	return r.ResponseWriter.Write(b)
-}
-
-func newStatusRecorder(w http.ResponseWriter) *StatusRecorder {
-	return &StatusRecorder{
-		ResponseWriter: w,
-		Status:         http.StatusOK,
-	}
-}
 
 func LogEndpointHitMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
-		wr := newStatusRecorder(w)
+		wr := interceptor.NewResponseRecorder(w)
 		next.ServeHTTP(wr, r)
 
 		end := time.Now()

@@ -21,13 +21,17 @@ func main() {
 	port := flag.Int("p", 8080, "port to expose the application")
 	flag.Parse()
 
-	s := storage.NewMemoryStorage()
+	// s := storage.NewInMemoryStorage()
+	ms, err := storage.NewMongoDBStorage("mongodb://mongodb:27017")
+	if err != nil {
+		log.Fatal(err)
+	}
 	router := http.NewServeMux()
 	prometheus.Init()
 
 	router.Handle("/metrics", promhttp.Handler())
-	router.Handle("/healthcheck", prometheus.Middleware(logs.LogEndpointHitMiddleware(health.Healthcheck())))
-	router.Handle("/contact", prometheus.Middleware(logs.LogEndpointHitMiddleware(phonebook.Contact(s))))
+	router.Handle("/healthcheck", prometheus.Middleware(logs.LogEndpointHitMiddleware(health.Healthcheck(ms))))
+	router.Handle("/contact", prometheus.Middleware(logs.LogEndpointHitMiddleware(phonebook.Contact(ms))))
 
 	srv := http.Server{
 		Addr:         fmt.Sprintf(":%v", *port),

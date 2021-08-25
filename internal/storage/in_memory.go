@@ -11,7 +11,7 @@ type InMemoryStorage struct {
 	PhoneBook map[string]Contact
 }
 
-func NewMemoryStorage() *InMemoryStorage {
+func NewInMemoryStorage() *InMemoryStorage {
 	return &InMemoryStorage{
 		PhoneBook: make(map[string]Contact),
 	}
@@ -81,4 +81,8 @@ func (m *InMemoryStorage) FindByName(name string) (response []Contact, err error
 	}
 
 	return
+}
+
+func (m *InMemoryStorage) HealthCheck() (bool, error) {
+	return true, nil
 }

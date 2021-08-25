@@ -1,12 +1,30 @@
 package health
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
 
-func Healthcheck() http.HandlerFunc {
+	"github.com/vitorduarte/phonebook/internal/storage"
+)
+
+type HealthCheckResponse struct {
+	Database string `json:"database"`
+}
+
+func Healthcheck(s storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application-json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message":"service is up and running"}`))
-		return
+		healthCheckResponse := &HealthCheckResponse{}
+
+		isDatabaseRunning := s.HealthCheck()
+		if isDatabaseRunning {
+			w.WriteHeader(http.StatusOK)
+			healthCheckResponse.Database = "OK"
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			healthCheckResponse.Database = "ERROR"
+		}
+
+		json.NewEncoder(w).Encode(healthCheckResponse)
 	}
 }

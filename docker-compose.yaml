@@ -6,6 +6,8 @@ services:
     build: .
     ports:
       - '8080:8080'
+    depends_on:
+      - mongodb
   prometheus:
     container_name: prometheus
     image: prom/prometheus:v2.29.0
@@ -29,7 +31,20 @@ services:
       - './grafana/provisioning:/etc/grafana/provisioning'
       - './grafana/phonebook.json:/var/lib/grafana/dashboards/phonebook.json'
       - grafana-storage:/var/lib/grafana
-
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - 27017:27017
+  mongodb-interface:
+    image: mongo-express
+    container_name: mongodb-interface
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
 volumes:
   grafana-storage:
   prometheus_data:

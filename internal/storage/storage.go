@@ -13,4 +13,5 @@ type Storage interface {
 	Update(c Contact) (Contact, error)
 	Delete(id string) error
 	FindByName(name string) ([]Contact, error)
+	HealthCheck() bool
 }

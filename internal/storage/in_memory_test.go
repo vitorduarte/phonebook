@@ -31,7 +31,7 @@ func TestNewMemoryStorage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewMemoryStorage(); !cmp.Equal(got, tt.want) {
+			if got := NewInMemoryStorage(); !cmp.Equal(got, tt.want) {
 				t.Errorf("NewMemoryStorage() = %v, want %v", got, tt.want)
 			}
 		})
@@ -51,7 +51,7 @@ func TestInMemoryStorage_Create(t *testing.T) {
 	}{
 		{
 			name: "empty_contact_should_return_error",
-			m:    NewMemoryStorage(),
+			m:    NewInMemoryStorage(),
 			args: args{
 				c: Contact{},
 			},
@@ -60,7 +60,7 @@ func TestInMemoryStorage_Create(t *testing.T) {
 		},
 		{
 			name: "empty_storage",
-			m:    NewMemoryStorage(),
+			m:    NewInMemoryStorage(),
 			args: args{c: Contact{
 				Name:  "Bob",
 				Phone: "999999999",
@@ -114,7 +114,7 @@ func TestInMemoryStorage_GetAll(t *testing.T) {
 	}{
 		{
 			name:       "empty_storage_should_return_empty_slice",
-			m:          NewMemoryStorage(),
+			m:          NewInMemoryStorage(),
 			wantResult: []Contact{},
 		},
 		{
@@ -163,13 +163,13 @@ func TestInMemoryStorage_Get(t *testing.T) {
 	}{
 		{
 			name:    "empty_id_should_return_error",
-			m:       NewMemoryStorage(),
+			m:       NewInMemoryStorage(),
 			args:    args{id: ""},
 			wantErr: true,
 		},
 		{
 			name:    "inexistent_id_should_return_error",
-			m:       NewMemoryStorage(),
+			m:       NewInMemoryStorage(),
 			args:    args{id: "d38cbda4-c419-410a-8fea-2ccd2523f2b2"},
 			wantErr: true,
 		},

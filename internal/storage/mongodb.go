@@ -85,23 +85,59 @@ func buildContactListFromResponse(ctx context.Context, cur *mongo.Cursor) (respo
 	return
 }
 
-func (ms *MongoStorage) Get(id string) (response Contact, err error) {
+func (ms *MongoStorage) Get(id string) (contact Contact, err error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return
 	}
 
 	findResult := ms.collection.FindOne(ms.ctx, bson.M{"_id": objectId})
-	findResult.Decode(&response)
-	response.Id = id
+	if findResult.Err() != nil {
+		err = fmt.Errorf("contact with id: %s does not exist on database", id)
+		return
+	}
+
+	findResult.Decode(&contact)
+	contact.Id = id
 	return
 }
 
-func (ms *MongoStorage) Update(c Contact) (response Contact, err error) {
+func (ms *MongoStorage) Update(c Contact) (contactResponse Contact, err error) {
+	id, err := primitive.ObjectIDFromHex(c.Id)
+	if err != nil {
+		return
+	}
+
+	updateResponse, err := ms.collection.UpdateOne(
+		ms.ctx,
+		bson.M{"_id": id},
+		bson.D{{"$set", c}},
+	)
+	if err != nil {
+		return
+	}
+	if updateResponse.ModifiedCount == 0 {
+		err = fmt.Errorf("contact with id: %s does not exist on database", c.Id)
+	}
+
+	contactResponse = c
 	return
 }
 
 func (ms *MongoStorage) Delete(id string) (err error) {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return
+	}
+
+	deleteResponse, err := ms.collection.DeleteOne(ms.ctx, bson.M{"_id": objectId})
+	if err != nil {
+		return
+	}
+	if deleteResponse.DeletedCount == 0 {
+		err = fmt.Errorf("contact with id: %s does not exist on database", id)
+	}
+
 	return
 }
 

@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 
 	// s := storage.NewInMemoryStorage()
-	ms, err := storage.NewMongoDBStorage("mongodb://mongodb:27017")
+	ms, err := storage.NewMongoStorage("mongodb://mongodb:27017")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,7 +31,7 @@ func main() {
 
 	router.Handle("/metrics", promhttp.Handler())
 	router.Handle("/healthcheck", prometheus.Middleware(logs.LogEndpointHitMiddleware(health.Healthcheck(ms))))
-	router.Handle("/contact", prometheus.Middleware(logs.LogEndpointHitMiddleware(phonebook.Contact(ms))))
+	router.Handle("/contact", prometheus.Middleware(logs.LogEndpointHitMiddleware(phonebook.ContactHandler(ms))))
 
 	srv := http.Server{
 		Addr:         fmt.Sprintf(":%v", *port),

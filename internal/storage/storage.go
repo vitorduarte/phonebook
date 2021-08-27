@@ -1,17 +1,13 @@
 package storage
 
-type Contact struct {
-	Id    string `json:"id"`
-	Name  string `json:"name"`
-	Phone string `json:"phone"`
-}
+import "github.com/vitorduarte/phonebook/internal/contact"
 
 type Storage interface {
-	Create(c Contact) (Contact, error)
-	GetAll() ([]Contact, error)
-	Get(id string) (Contact, error)
-	Update(c Contact) (Contact, error)
+	Create(c contact.Contact) (contact.Contact, error)
+	GetAll() ([]contact.Contact, error)
+	Get(id string) (contact.Contact, error)
+	Update(c contact.Contact) (contact.Contact, error)
 	Delete(id string) error
-	FindByName(name string) ([]Contact, error)
+	FindByName(name string) ([]contact.Contact, error)
 	HealthCheck() bool
 }

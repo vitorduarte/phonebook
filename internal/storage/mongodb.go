@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/vitorduarte/phonebook/internal/contact"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,13 +18,14 @@ type MongoStorage struct {
 	ctx        context.Context
 }
 
-func NewMongoDBStorage(url string) (ms *MongoStorage, err error) {
+func NewMongoStorage(url string) (ms *MongoStorage, err error) {
 	client, err := mongo.NewClient(options.Client().ApplyURI(url))
 	if err != nil {
 		return
 	}
 
-	ctx, _ := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	err = client.Connect(ctx)
 	if err != nil {
 		return
@@ -34,7 +36,7 @@ func NewMongoDBStorage(url string) (ms *MongoStorage, err error) {
 	return
 }
 
-func (ms *MongoStorage) Create(c Contact) (contactResponse Contact, err error) {
+func (ms *MongoStorage) Create(c contact.Contact) (contactResponse contact.Contact, err error) {
 	if c.Name == "" && c.Phone == "" {
 		err = fmt.Errorf("Name and phone cannot be empty")
 		return
@@ -46,11 +48,11 @@ func (ms *MongoStorage) Create(c Contact) (contactResponse Contact, err error) {
 	}
 
 	id := res.InsertedID.(primitive.ObjectID).Hex()
-	contactResponse = Contact{Id: id, Name: c.Name, Phone: c.Phone}
+	contactResponse = contact.Contact{Id: id, Name: c.Name, Phone: c.Phone}
 	return
 }
 
-func (ms *MongoStorage) GetAll() (response []Contact, err error) {
+func (ms *MongoStorage) GetAll() (response []contact.Contact, err error) {
 	cur, err := ms.collection.Find(ms.ctx, bson.D{{}})
 	if err != nil {
 		return
@@ -63,18 +65,18 @@ func (ms *MongoStorage) GetAll() (response []Contact, err error) {
 	return
 }
 
-func buildContactListFromResponse(ctx context.Context, cur *mongo.Cursor) (response []Contact, err error) {
+func buildContactListFromResponse(ctx context.Context, cur *mongo.Cursor) (response []contact.Contact, err error) {
 	for cur.Next(ctx) {
-		var contact map[string]interface{}
-		err = cur.Decode(&contact)
+		var curContact map[string]interface{}
+		err = cur.Decode(&curContact)
 		if err != nil {
 			return
 		}
 
-		response = append(response, Contact{
-			Id:    contact["_id"].(primitive.ObjectID).Hex(),
-			Name:  contact["name"].(string),
-			Phone: contact["phone"].(string),
+		response = append(response, contact.Contact{
+			Id:    curContact["_id"].(primitive.ObjectID).Hex(),
+			Name:  curContact["name"].(string),
+			Phone: curContact["phone"].(string),
 		})
 	}
 	if err = cur.Err(); err != nil {
@@ -85,7 +87,7 @@ func buildContactListFromResponse(ctx context.Context, cur *mongo.Cursor) (respo
 	return
 }
 
-func (ms *MongoStorage) Get(id string) (contact Contact, err error) {
+func (ms *MongoStorage) Get(id string) (contact contact.Contact, err error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return
@@ -102,7 +104,7 @@ func (ms *MongoStorage) Get(id string) (contact Contact, err error) {
 	return
 }
 
-func (ms *MongoStorage) Update(c Contact) (contactResponse Contact, err error) {
+func (ms *MongoStorage) Update(c contact.Contact) (contactResponse contact.Contact, err error) {
 	id, err := primitive.ObjectIDFromHex(c.Id)
 	if err != nil {
 		return
@@ -141,7 +143,7 @@ func (ms *MongoStorage) Delete(id string) (err error) {
 	return
 }
 
-func (ms *MongoStorage) FindByName(name string) (response []Contact, err error) {
+func (ms *MongoStorage) FindByName(name string) (response []contact.Contact, err error) {
 	regexSearch := primitive.Regex{Pattern: name, Options: ""}
 	cur, err := ms.collection.Find(ms.ctx, bson.M{"name": regexSearch})
 	response, err = buildContactListFromResponse(ms.ctx, cur)

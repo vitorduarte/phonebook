@@ -24,8 +24,7 @@ func NewMongoStorage(url string) (ms *MongoStorage, err error) {
 		return
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx, _ := context.WithCancel(context.Background())
 	err = client.Connect(ctx)
 	if err != nil {
 		return

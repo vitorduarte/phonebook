@@ -28,7 +28,7 @@ func TestCreateContactHandler(t *testing.T) {
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodPost,
-						"/contacts", strings.NewReader(`{"name":"Bob Silva","phone":"999999999"}`),
+						"/contact", strings.NewReader(`{"name":"Bob Silva","phone":"999999999"}`),
 					)
 				},
 			},
@@ -41,7 +41,7 @@ func TestCreateContactHandler(t *testing.T) {
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodPost,
-						"/contacts", strings.NewReader(`{"name":"","phone":"999999999"}`),
+						"/contact", strings.NewReader(`{"name":"","phone":"999999999"}`),
 					)
 				},
 			},
@@ -54,7 +54,7 @@ func TestCreateContactHandler(t *testing.T) {
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodPost,
-						"/contacts",
+						"/contact",
 						strings.NewReader(`{"name":"","phone":""}`),
 					)
 				},
@@ -68,7 +68,7 @@ func TestCreateContactHandler(t *testing.T) {
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodPost,
-						"/contacts",
+						"/contact",
 						strings.NewReader(`{}`),
 					)
 				},
@@ -82,7 +82,7 @@ func TestCreateContactHandler(t *testing.T) {
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodPost,
-						"/contacts",
+						"/contact",
 						nil,
 					)
 				},
@@ -96,7 +96,7 @@ func TestCreateContactHandler(t *testing.T) {
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodPost,
-						"/contacts",
+						"/contact",
 						strings.NewReader(`invalidJson`),
 					)
 				},
@@ -112,7 +112,7 @@ func TestCreateContactHandler(t *testing.T) {
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodPost,
-						"/contacts",
+						"/contact",
 						strings.NewReader(`{"name":"Bob Silva","phone":"999999999"}`),
 					)
 				},

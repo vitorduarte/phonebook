@@ -32,6 +32,7 @@ func main() {
 	router.Handle("/metrics", promhttp.Handler())
 	router.Handle("/healthcheck", prometheus.Middleware(logs.LogEndpointHitMiddleware(health.Healthcheck(ms))))
 	router.Handle("/contact", prometheus.Middleware(logs.LogEndpointHitMiddleware(phonebook.ContactHandler(ms))))
+	router.Handle("/contact/", prometheus.Middleware(logs.LogEndpointHitMiddleware(phonebook.ContactHandler(ms))))
 
 	srv := http.Server{
 		Addr:         fmt.Sprintf(":%v", *port),

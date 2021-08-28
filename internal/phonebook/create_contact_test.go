@@ -1,6 +1,7 @@
 package phonebook
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -87,6 +88,36 @@ func TestCreateContactHandler(t *testing.T) {
 				},
 			},
 			wantStatusCode: http.StatusBadRequest,
+		},
+		{
+			name: "create_returns_400_when_body_is_not_a_json",
+			args: args{
+				storage: &storage.MockStorage{},
+				req: func() *http.Request {
+					return httptest.NewRequest(
+						http.MethodPost,
+						"/contacts",
+						strings.NewReader(`invalidJson`),
+					)
+				},
+			},
+			wantStatusCode: http.StatusBadRequest,
+		},
+		{
+			name: "create_returns_500_when_repository_fails",
+			args: args{
+				storage: &storage.MockStorage{
+					Error: errors.New("invalid connection"),
+				},
+				req: func() *http.Request {
+					return httptest.NewRequest(
+						http.MethodPost,
+						"/contacts",
+						strings.NewReader(`{"name":"Bob Silva","phone":"999999999"}`),
+					)
+				},
+			},
+			wantStatusCode: http.StatusInternalServerError,
 		},
 	}
 	for _, tt := range tests {

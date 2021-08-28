@@ -46,6 +46,7 @@ func UpdateContactHandler(s storage.Storage) http.HandlerFunc {
 			return
 		}
 
-		json.NewEncoder(w).Encode(response)
+		responseBytes, _ := json.Marshal(response)
+		w.Write(responseBytes)
 	}
 }

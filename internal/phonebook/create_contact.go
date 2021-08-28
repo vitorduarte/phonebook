@@ -31,7 +31,6 @@ func CreateContactHandler(s storage.Storage) http.HandlerFunc {
 		}
 
 		response, appErr := CreateContact(s, contact)
-
 		if appErr.Error != nil {
 			msg := fmt.Sprintf("could not create contact: %v", appErr.Error)
 			w.WriteHeader(appErr.StatusCode)
@@ -39,7 +38,8 @@ func CreateContactHandler(s storage.Storage) http.HandlerFunc {
 			return
 		}
 
-		json.NewEncoder(w).Encode(response)
+		responseBytes, _ := json.Marshal(response)
+		w.Write(responseBytes)
 	}
 }
 

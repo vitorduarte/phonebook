@@ -22,7 +22,7 @@ func GetContactsHandler(s storage.Storage) http.HandlerFunc {
 			GetContactById(s)(w, r)
 			return
 		}
-		FindContactsByName(s)(w, r)
+		FindContactsByNameHandler(s)(w, r)
 
 	}
 }

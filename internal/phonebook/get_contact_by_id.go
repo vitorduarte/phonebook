@@ -20,7 +20,7 @@ func GetContactById(s storage.Storage) http.HandlerFunc {
 			return
 		}
 
-		json.NewEncoder(w).Encode(contact)
-		return
+		responseBytes, _ := json.Marshal(contact)
+		w.Write(responseBytes)
 	}
 }

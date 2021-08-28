@@ -23,7 +23,8 @@ func GetAllContacts(s storage.Storage) http.HandlerFunc {
 			response[i] = c
 		}
 
-		json.NewEncoder(w).Encode(response)
+		responseBytes, _ := json.Marshal(response)
+		w.Write(responseBytes)
 		return
 	}
 }

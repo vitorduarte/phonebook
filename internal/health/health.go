@@ -25,6 +25,7 @@ func Healthcheck(s storage.Storage) http.HandlerFunc {
 			healthCheckResponse.Database = "ERROR"
 		}
 
-		json.NewEncoder(w).Encode(healthCheckResponse)
+		responseBytes, _ := json.Marshal(healthCheckResponse)
+		w.Write(responseBytes)
 	}
 }

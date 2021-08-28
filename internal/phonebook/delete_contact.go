@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/vitorduarte/phonebook/internal/contact"
 	"github.com/vitorduarte/phonebook/internal/storage"
 	"github.com/vitorduarte/phonebook/internal/utils"
 )
@@ -31,10 +32,17 @@ func DeleteContactHandler(s storage.Storage) http.HandlerFunc {
 }
 
 func DeleteContact(s storage.Storage, id string) (appErr utils.AppError) {
-	_, err := s.Get(id)
+	receivedContact, err := s.Get(id)
 	if err != nil {
 		return utils.AppError{
 			Error:      err,
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	if (receivedContact == contact.Contact{}) {
+		return utils.AppError{
+			Error:      fmt.Errorf("could not find contact %s", id),
 			StatusCode: http.StatusNotFound,
 		}
 	}

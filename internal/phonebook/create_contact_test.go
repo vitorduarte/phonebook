@@ -122,7 +122,7 @@ func TestCreateContactHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := CreateContactHandler(tt.args.storage)
+			handler := ContactHandler(tt.args.storage)
 			w := httptest.NewRecorder()
 			handler(w, tt.args.req())
 			result := w.Result()

@@ -78,7 +78,7 @@ func TestDeleteContactHandler(t *testing.T) {
 				},
 				req: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodPost,
+						http.MethodDelete,
 						"/contact/1",
 						strings.NewReader(""),
 					)
@@ -89,7 +89,7 @@ func TestDeleteContactHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := DeleteContactHandler(tt.args.storage)
+			handler := ContactHandler(tt.args.storage)
 			w := httptest.NewRecorder()
 			handler(w, tt.args.req())
 			result := w.Result()

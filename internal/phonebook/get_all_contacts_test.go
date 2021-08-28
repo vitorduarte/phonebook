@@ -12,7 +12,7 @@ import (
 	"github.com/vitorduarte/phonebook/internal/storage"
 )
 
-func TestGetAllContactsByNameHandler(t *testing.T) {
+func TestGetAllContactsHandler(t *testing.T) {
 	type args struct {
 		storage storage.Storage
 		req     func() *http.Request
@@ -109,20 +109,20 @@ func TestGetAllContactsByNameHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := GetAllContactsHandler(tt.args.storage)
+			handler := ContactHandler(tt.args.storage)
 			w := httptest.NewRecorder()
 			handler(w, tt.args.req())
 			result := w.Result()
 
 			if result.StatusCode != tt.wantStatusCode {
-				t.Errorf("GetAllContactsByNameHandler() status = %v, want %v", result.StatusCode, tt.wantStatusCode)
+				t.Errorf("GetAllContactsHandler() status = %v, want %v", result.StatusCode, tt.wantStatusCode)
 			}
 
 			if tt.wantBody != "" {
 				body, _ := ioutil.ReadAll(result.Body)
 				bodyString := string(body)
 				if bodyString != tt.wantBody {
-					t.Errorf("GetAllContactsByNameHandler() body = %v, want %v", bodyString, tt.wantBody)
+					t.Errorf("GetAllContactsHandler() body = %v, want %v", bodyString, tt.wantBody)
 				}
 			}
 		})

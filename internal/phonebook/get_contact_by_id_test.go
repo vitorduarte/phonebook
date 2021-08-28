@@ -12,7 +12,7 @@ import (
 	"github.com/vitorduarte/phonebook/internal/storage"
 )
 
-func TestFindContactsByNameHandler(t *testing.T) {
+func TestGetContactByIdHandler(t *testing.T) {
 	type args struct {
 		storage storage.Storage
 		req     func() *http.Request
@@ -25,73 +25,42 @@ func TestFindContactsByNameHandler(t *testing.T) {
 		wantBody       string
 	}{
 		{
-			name: "find_contacts_by_name_returns_200_and_the_contact_when_it_exists",
+			name: "get_contact_by_id_returns_200_and_the_contact_when_it_exist",
 			args: args{
 				storage: &storage.MockStorage{
-					Contacts: []contact.Contact{
-						{
-							Id:    "1",
-							Name:  "Bob",
-							Phone: "999999999",
-						},
+					Contact: contact.Contact{
+						Id:    "1",
+						Name:  "Bob",
+						Phone: "999999999",
 					},
 				},
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
-						"/contact?name=Bob",
+						"/contact/1",
 						strings.NewReader(""),
 					)
 				},
 			},
 			wantStatusCode: http.StatusOK,
-			wantBody:       `[{"id":"1","name":"Bob","phone":"999999999"}]`,
+			wantBody:       `{"id":"1","name":"Bob","phone":"999999999"}`,
 		},
 		{
-			name: "find_contacts_by_name_returns_200_and_empty_list_when_not_found",
+			name: "get_contact_by_id_returns_404_when_does_not_exist",
 			args: args{
 				storage: &storage.MockStorage{},
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
-						"/contact?name=Bob",
+						"/contact/1",
 						strings.NewReader(""),
 					)
 				},
 			},
-			wantStatusCode: http.StatusOK,
-			wantBody:       `[]`,
+			wantStatusCode: http.StatusNotFound,
 		},
 		{
-			name: "find_contacts_by_name_returns_200_and_the_contacts_when_contains_name",
-			args: args{
-				storage: &storage.MockStorage{
-					Contacts: []contact.Contact{
-						{
-							Id:    "1",
-							Name:  "Bob Silva",
-							Phone: "999999999",
-						},
-						{
-							Id:    "2",
-							Name:  "Alice Silva",
-							Phone: "999999999",
-						},
-					},
-				},
-				req: func() *http.Request {
-					return httptest.NewRequest(
-						http.MethodGet,
-						"/contact?name=Silva",
-						strings.NewReader(""),
-					)
-				},
-			},
-			wantStatusCode: http.StatusOK,
-			wantBody:       `[{"id":"1","name":"Bob Silva","phone":"999999999"},{"id":"2","name":"Alice Silva","phone":"999999999"}]`,
-		},
-		{
-			name: "find_contacts_by_name_returns_500_when_repository_fails",
+			name: "get_contact_by_id_returns_500_when_repository_fails",
 			args: args{
 				storage: &storage.MockStorage{
 					Error: errors.New("invalid connection"),
@@ -99,7 +68,7 @@ func TestFindContactsByNameHandler(t *testing.T) {
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
-						"/contact?name=Bob",
+						"/contact/1",
 						strings.NewReader(""),
 					)
 				},
@@ -115,14 +84,14 @@ func TestFindContactsByNameHandler(t *testing.T) {
 			result := w.Result()
 
 			if result.StatusCode != tt.wantStatusCode {
-				t.Errorf("FindContactsByNameHandler() status = %v, want %v", result.StatusCode, tt.wantStatusCode)
+				t.Errorf("GetContactByIdHandler() status = %v, want %v", result.StatusCode, tt.wantStatusCode)
 			}
 
 			if tt.wantBody != "" {
 				body, _ := ioutil.ReadAll(result.Body)
 				bodyString := string(body)
 				if bodyString != tt.wantBody {
-					t.Errorf("FindContactsByNameHandler() body = %v, want %v", bodyString, tt.wantBody)
+					t.Errorf("GetContactByIdHandler() body = %v, want %v", bodyString, tt.wantBody)
 				}
 			}
 		})

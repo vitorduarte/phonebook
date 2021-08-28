@@ -3,7 +3,6 @@ package phonebook
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/vitorduarte/phonebook/internal/contact"
 	"github.com/vitorduarte/phonebook/internal/storage"
@@ -13,7 +12,7 @@ import (
 func DeleteContactHandler(s storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		id := strings.TrimPrefix(r.URL.Path, "/contact/")
+		id := utils.GetIdFromPath(r, "/contact/")
 		if id == "" {
 			msg := fmt.Sprintf("delete requires an id")
 			w.WriteHeader(http.StatusBadRequest)

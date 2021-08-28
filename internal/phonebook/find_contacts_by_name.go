@@ -14,7 +14,7 @@ func FindContactsByNameHandler(s storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		name := r.URL.Query().Get("name")
 
-		response, appErr := FuindContactsByName(s, name)
+		response, appErr := FindContactsByName(s, name)
 		if appErr.Error != nil {
 			msg := fmt.Sprintf("could not find contacts by name: %v", appErr.Error)
 			w.WriteHeader(appErr.StatusCode)
@@ -27,7 +27,7 @@ func FindContactsByNameHandler(s storage.Storage) http.HandlerFunc {
 	}
 }
 
-func FuindContactsByName(s storage.Storage, name string) (response []contact.Contact, appErr utils.AppError) {
+func FindContactsByName(s storage.Storage, name string) (response []contact.Contact, appErr utils.AppError) {
 	contacts, err := s.FindByName(name)
 	if err != nil {
 		appErr = utils.AppError{Error: err, StatusCode: http.StatusInternalServerError}

@@ -15,7 +15,7 @@ func GetContactsHandler(s storage.Storage) http.HandlerFunc {
 		isGetById := id != ""
 
 		if isGetAll {
-			GetAllContacts(s)(w, r)
+			GetAllContactsHandler(s)(w, r)
 			return
 		}
 		if isGetById {

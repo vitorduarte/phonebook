@@ -8,7 +8,7 @@ import (
 	"github.com/vitorduarte/phonebook/internal/storage"
 )
 
-func GetAllContacts(s storage.Storage) http.HandlerFunc {
+func GetAllContactsHandler(s storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		contacts, err := s.GetAll()
 		if err != nil {

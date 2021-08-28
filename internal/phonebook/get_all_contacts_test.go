@@ -12,7 +12,7 @@ import (
 	"github.com/vitorduarte/phonebook/internal/storage"
 )
 
-func TestFindContactsByNameHandler(t *testing.T) {
+func TestGetAllContactsByNameHandler(t *testing.T) {
 	type args struct {
 		storage storage.Storage
 		req     func() *http.Request
@@ -25,7 +25,7 @@ func TestFindContactsByNameHandler(t *testing.T) {
 		wantBody       string
 	}{
 		{
-			name: "find_contacts_by_name_returns_200_and_the_contact_when_it_exists",
+			name: "get_all_contacts_returns_200_and_the_contact_when_it_is_only_one",
 			args: args{
 				storage: &storage.MockStorage{
 					Contacts: []contact.Contact{
@@ -39,7 +39,7 @@ func TestFindContactsByNameHandler(t *testing.T) {
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
-						"/contact?name=Bob",
+						"/contact",
 						strings.NewReader(""),
 					)
 				},
@@ -48,13 +48,13 @@ func TestFindContactsByNameHandler(t *testing.T) {
 			wantBody:       `[{"id":"1","name":"Bob","phone":"999999999"}]`,
 		},
 		{
-			name: "find_contacts_by_name_returns_200_and_empty_list_when_not_found",
+			name: "get_all_contacts_returns_200_and_empty_list_when_storage_is_empty",
 			args: args{
 				storage: &storage.MockStorage{},
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
-						"/contact?name=Bob",
+						"/contact",
 						strings.NewReader(""),
 					)
 				},
@@ -63,7 +63,7 @@ func TestFindContactsByNameHandler(t *testing.T) {
 			wantBody:       `[]`,
 		},
 		{
-			name: "find_contacts_by_name_returns_200_and_the_contacts_when_contains_name",
+			name: "get_all_contacts_returns_200_and_the_contacts_when_has_multiple",
 			args: args{
 				storage: &storage.MockStorage{
 					Contacts: []contact.Contact{
@@ -82,7 +82,7 @@ func TestFindContactsByNameHandler(t *testing.T) {
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
-						"/contact?name=Silva",
+						"/contact",
 						strings.NewReader(""),
 					)
 				},
@@ -91,7 +91,7 @@ func TestFindContactsByNameHandler(t *testing.T) {
 			wantBody:       `[{"id":"1","name":"Bob Silva","phone":"999999999"},{"id":"2","name":"Alice Silva","phone":"999999999"}]`,
 		},
 		{
-			name: "find_contacts_by_name_returns_500_when_repository_fails",
+			name: "get_all_contacts_returns_500_when_repository_fails",
 			args: args{
 				storage: &storage.MockStorage{
 					Error: errors.New("invalid connection"),
@@ -99,7 +99,7 @@ func TestFindContactsByNameHandler(t *testing.T) {
 				req: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
-						"/contact?name=Bob",
+						"/contact",
 						strings.NewReader(""),
 					)
 				},
@@ -109,20 +109,20 @@ func TestFindContactsByNameHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := FindContactsByNameHandler(tt.args.storage)
+			handler := GetAllContactsHandler(tt.args.storage)
 			w := httptest.NewRecorder()
 			handler(w, tt.args.req())
 			result := w.Result()
 
 			if result.StatusCode != tt.wantStatusCode {
-				t.Errorf("FindContactsByNameHandler() status = %v, want %v", result.StatusCode, tt.wantStatusCode)
+				t.Errorf("GetAllContactsByNameHandler() status = %v, want %v", result.StatusCode, tt.wantStatusCode)
 			}
 
 			if tt.wantBody != "" {
 				body, _ := ioutil.ReadAll(result.Body)
 				bodyString := string(body)
 				if bodyString != tt.wantBody {
-					t.Errorf("FindContactsByNameHandler() body = %v, want %v", bodyString, tt.wantBody)
+					t.Errorf("GetAllContactsByNameHandler() body = %v, want %v", bodyString, tt.wantBody)
 				}
 			}
 		})

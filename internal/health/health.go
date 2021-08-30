@@ -11,7 +11,7 @@ type HealthCheckResponse struct {
 	Database string `json:"database"`
 }
 
-func Healthcheck(s storage.Storage) http.HandlerFunc {
+func HealthCheckHandler(s storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application-json")
 		healthCheckResponse := &HealthCheckResponse{}

@@ -71,7 +71,7 @@ func TestDeleteContactHandler(t *testing.T) {
 			wantStatusCode: http.StatusBadRequest,
 		},
 		{
-			name: "delete_returns_500_when_repository_fails",
+			name: "delete_returns_404_when_repository_fails",
 			args: args{
 				storage: &storage.MockStorage{
 					Error: errors.New("invalid connection"),
@@ -84,7 +84,7 @@ func TestDeleteContactHandler(t *testing.T) {
 					)
 				},
 			},
-			wantStatusCode: http.StatusInternalServerError,
+			wantStatusCode: http.StatusNotFound,
 		},
 	}
 	for _, tt := range tests {

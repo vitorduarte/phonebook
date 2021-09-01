@@ -35,7 +35,7 @@ func DeleteContact(s storage.Storage, id string) (appErr utils.AppError) {
 	if err != nil {
 		return utils.AppError{
 			Error:      err,
-			StatusCode: http.StatusInternalServerError,
+			StatusCode: http.StatusNotFound,
 		}
 	}
 

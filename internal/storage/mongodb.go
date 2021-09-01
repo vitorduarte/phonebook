@@ -89,6 +89,7 @@ func buildContactListFromResponse(ctx context.Context, cur *mongo.Cursor) (respo
 func (ms *MongoStorage) Get(id string) (contact contact.Contact, err error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
+		err = fmt.Errorf("contact with id: %s does not exist on database", id)
 		return
 	}
 

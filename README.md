@@ -46,9 +46,9 @@ To run the unit tests you need to run the following command:
 go test ./internal/...
 ```
 
-### E2E tests
+### End to end tests
 
-To run the e2e tests, make sure that the containers are not running executing:
+To run the end to end tests, make sure that the containers are not running executing:
 
 ```
 docker-compose down -v

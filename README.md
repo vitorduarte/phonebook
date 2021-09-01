@@ -19,6 +19,10 @@ docker-compose up -d
 
 This command will run an instance of MongoDB, Grafana, Prometheus and the application Phonebook.
 
+## Docs
+
+An postman collection was provided with the requests to using the application. You can import using the file `postman_collection.json`
+
 ## Metrics
 
 The application exposes metrics for prometheus on `/metrics` endpoint.

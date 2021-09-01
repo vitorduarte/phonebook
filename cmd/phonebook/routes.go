@@ -13,6 +13,7 @@ import (
 
 func GetRoutes(s storage.Storage) *http.ServeMux {
 	router := http.NewServeMux()
+	prometheus.Init()
 
 	router.Handle("/metrics", promhttp.Handler())
 	router.Handle("/healthcheck", prometheus.Middleware(logs.LogEndpointHitMiddleware(health.HealthCheckHandler(s))))
